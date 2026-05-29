@@ -4,321 +4,280 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>臨床能量炸彈 - 醫護跨領域團康版</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* 使用原生 CSS 確保沒有 Tailwind 也能 100% 顯示精美介面 */
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap');                
+        :root {
+            --primary-glow: rgba(249, 115, 22, 0.4);
+        }
         body {
-            background-color: #09090b;
-            color: #ffffff;
-            font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft JhengHei", sans-serif;
-            margin: 0;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
+            font-family: 'Noto Sans TC', sans-serif;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            transition: background-color 0.3s;
         }
-        .container {
-            max-width: 450px;
-            width: 100%;
-            background-color: #18181b;
-            border: 1px solid #27272a;
-            border-radius: 30px;
-            padding: 20px;
-            text-align: center;
-            box-sizing: border-box;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        /* 炸彈呼吸感 */
+        .bomb-pulse {
+            animation: pulse 1.2s infinite ease-in-out;
         }
-        h1 {
-            font-size: 28px;
-            font-weight: 900;
-            margin: 0 0 5px 0;
-            background: linear-gradient(135deg, #fb923c, #dc2626);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-style: italic;
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px var(--primary-glow)); }
+            50% { transform: scale(1.08); filter: drop-shadow(0 0 40px rgba(249, 115, 22, 0.8)); }
         }
-        .status-badge {
-            font-size: 10px;
-            font-weight: bold;
-            padding: 3px 8px;
-            border-radius: 999px;
-            background-color: #27272a;
-            color: #a1a1aa;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: inline-block;
+        /* 緊張震動 */
+        .shaking {
+            animation: shake 0.1s infinite;
         }
-        .stage {
-            background-color: rgba(0,0,0,0.3);
-            border: 1px solid #27272a;
-            border-radius: 20px;
-            aspect-ratio: 1/1;
-            width: 100%;
-            margin: 15px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            box-sizing: border-box;
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            25% { transform: translate(-2px, -1px) rotate(-0.5deg); }
+            50% { transform: translate(-1px, 2px) rotate(0.5deg); }
+            75% { transform: translate(2px, 1px) rotate(-0.5deg); }
+            100% { transform: translate(1px, -2px) rotate(0deg); }
         }
-        .bomb-wrapper {
-            width: 70%;
-            height: 70%;
+        /* 螢幕警報紅光 */
+        .red-alert {
+            animation: alert-glow 0.4s infinite alternate;
         }
-        .topic-box {
-            background-color: #27272a;
-            border: 1px solid #3f3f46;
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
+        @keyframes alert-glow {
+            from { box-shadow: inset 0 0 0px rgba(220, 38, 38, 0); background-color: #09090b; }
+            to { box-shadow: inset 0 0 60px rgba(220, 38, 38, 0.6); background-color: #1a0505; }
         }
-        .topic-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: #f97316;
-            letter-spacing: 2px;
-            display: block;
-            margin-bottom: 8px;
+        /* 爆炸瞬間特效 */
+        .explosion-impact {
+            animation: impact 0.4s ease-out forwards;
         }
-        .topic-main {
-            font-size: 20px;
-            font-weight: 900;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1.4;
+        @keyframes impact {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
         }
-        .control-grid {
-            display: flex;
-            gap: 10px;
-        }
-        .btn {
-            flex: 1;
-            padding: 15px 10px;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border: none;
+        input[type=range] {
+            accent-color: #f97316;
             cursor: pointer;
-            color: white;
-            transition: opacity 0.2s;
         }
-        .btn-grey { background-color: #3f3f46; }
-        .btn-orange { 
-            background-color: #ea580c; 
-            box-shadow: 0 4px 0 #9a3412;
+        .glass-panel {
+            background: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .btn:disabled {
-            background-color: #27272a !important;
-            color: #71717a !important;
-            box-shadow: none !important;
-            cursor: not-allowed;
+        .btn-active:active {
+            transform: scale(0.95);
         }
-        .tip-box {
-            margin-top: 15px;
-            text-align: left;
-            background-color: rgba(0,0,0,0.2);
-            border: 1px solid #27272a;
-            padding: 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            color: #a1a1aa;
-            line-height: 1.5;
-        }
-        .mask {
+        .no-scrollbar::-webkit-scrollbar {
             display: none;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #dc2626;
-            z-index: 20;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            box-sizing: border-box;
-        }
-        .boom-text {
-            font-size: 60px;
-            font-weight: 900;
-            font-style: italic;
-            margin-bottom: 10px;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
-        .panel {
-            background-color: rgba(24,24,27,0.95);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px;
-            padding: 15px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .panel-title {
-            font-size: 11px;
-            font-weight: bold;
-            color: #f87171;
-            margin: 0 0 5px 0;
-            letter-spacing: 1px;
-        }
-        .panel-body {
-            font-size: 15px;
-            font-weight: bold;
-            line-height: 1.4;
-            margin: 0;
-        }
-        /* 降級相容動畫：使用標準 CSS3 避免老舊手機不支援 */
-        .pulse-effect {
-            animation: pulse-ani 1.2s infinite ease-in-out;
-        }
-        @keyframes pulse-ani {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.06); }
-        }
+        }    
     </style>
 </head>
-<body>
-
-    <div class="container">
-        <div style="text-align: left; margin-bottom: 10px;">
-            <h1>臨床能量炸彈</h1>
-            <span id="game-status" class="status-badge" style="background-color: #27272a; color: #a1a1aa;">Ready</span>
+<body id="main-body" class="bg-zinc-950 text-white min-h-screen flex flex-col items-center justify-start py-6 md:py-12 px-4 overflow-x-hidden transition-all">
+    
+    <div id="youtube-player" class="hidden"></div>
+    
+    <div class="max-w-md md:max-w-lg w-full bg-zinc-900/80 rounded-[3.5rem] p-6 md:p-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.8)] border border-white/5 text-center relative">                
+        
+        <div class="flex justify-between items-start mb-6">
+            <div class="text-left">
+                <h1 class="text-3xl md:text-4xl font-black bg-gradient-to-br from-orange-400 to-red-600 bg-clip-text text-transparent italic tracking-tighter">臨床能量炸彈</h1>
+                <div class="flex items-center gap-2 mt-1">
+                    <span id="game-status" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-500 uppercase tracking-widest">Ready</span>
+                    <button onclick="toggleMute()" id="mute-btn" class="p-1 hover:bg-white/10 rounded">
+                        <svg id="speaker-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-zinc-500"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </button>
+                </div>
+            </div>                        
+            <div class="flex gap-2">
+                <button onclick="toggleFullScreen()" class="p-3 bg-zinc-800/50 hover:bg-zinc-700 rounded-2xl transition-all btn-active border border-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+                </button>
+                <button onclick="toggleSettings()" class="p-3 bg-zinc-800/50 hover:bg-zinc-700 rounded-2xl transition-all btn-active border border-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
         </div>
 
-        <div id="game-stage" class="stage">
-            <div id="bomb-visual-wrapper" class="bomb-wrapper">
-                <svg id="bomb-svg" viewBox="0 0 100 100" style="width: 100%; height: 100%; fill: #52525b;">
-                    <circle cx="50" cy="60" r="35" />
-                    <circle cx="38" cy="48" r="12" fill="#ffffff" fill-opacity="0.1" />
-                    <rect x="42" y="16" width="16" height="10" rx="2" />
-                    <path d="M50 16 Q50 5 70 5 T85 18" stroke="#52525b" stroke-width="4" fill="none" stroke-linecap="round" />
-                    <circle id="fuse-fire" cx="85" cy="18" r="5" fill="#f97316" style="display: none;" />
+        <div id="game-stage" class="relative mb-6 aspect-square flex items-center justify-center bg-black/20 rounded-[3rem] border border-white/5 overflow-hidden shadow-inner">
+            <div id="bomb-visual-wrapper" class="w-3/4 h-3/4 transition-all duration-700">
+                <svg id="bomb-svg" viewBox="0 0 100 100" class="w-full h-full text-zinc-700">
+                    <circle cx="50" cy="60" r="35" fill="currentColor" />
+                    <circle cx="38" cy="48" r="12" fill="white" fill-opacity="0.08" />
+                    <rect x="42" y="16" width="16" height="10" rx="2" fill="currentColor" />
+                    <path d="M50 16 Q50 5 70 5 T85 18" stroke="currentColor" stroke-width="4" fill="none" stroke-linecap="round" />
+                    <circle id="fuse-fire" cx="85" cy="18" r="5" fill="#f97316" class="hidden" />
                 </svg>
             </div>
             
-            <div id="explosion-mask" class="mask">
-                <div class="boom-text">BOOM!</div>
-                <div class="panel">
-                    <p class="panel-title">🚨 能量引爆！護理臨床反思 🚨</p>
-                    <p id="penalty-text" class="panel-body"></p>
+            <div id="explosion-mask" class="hidden absolute inset-0 bg-red-600 z-20 flex flex-col items-center justify-center p-6">
+                <div id="boom-text" class="text-6xl md:text-8xl font-black italic tracking-tighter mb-4 drop-shadow-2xl">BOOM!</div>
+                <div class="glass-panel rounded-3xl p-5 w-full shadow-2xl border-red-400/30">
+                    <p class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">🚨 能量引爆！護理臨床反思 🚨</p>
+                    <p id="penalty-text" class="text-lg md:text-xl font-bold leading-snug text-white"></p>
                 </div>
             </div>
         </div>
 
-        <div class="topic-box">
-            <span class="topic-title">📢 請接龍！下列能量的臨床應用：</span>
-            <div id="topic-text" class="topic-main">請點擊下方出題按鈕</div>
+        <div class="space-y-4 mb-6">
+            <div id="topic-container" class="bg-zinc-800/80 rounded-3xl p-5 border border-white/5 shadow-inner transition-all duration-300">
+                <span class="text-[10px] font-black text-orange-500 tracking-[0.3em] uppercase block mb-2">📢 請接龍！下列能量的臨床應用：</span>
+                <div id="topic-text" class="text-xl md:text-3xl font-black text-white min-h-[4.5rem] flex items-center justify-center leading-snug px-2">請點擊下方出題按鈕</div>
+            </div>
         </div>
 
-        <div class="control-grid">
-            <button id="get-topic-btn" class="btn btn-grey" onclick="handleNewTopic()">🔄 抽取隨機能量</button>
-            <button id="start-btn" class="btn btn-orange" disabled onclick="handleStartGame()">🔥 點燃引信</button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button id="get-topic-btn" class="bg-zinc-800 hover:bg-zinc-700 py-4 px-6 rounded-3xl font-bold text-zinc-200 transition-all btn-active border border-white/10 shadow-lg text-lg">
+                🔄 抽取隨機能量
+            </button>
+            <button id="start-btn" disabled class="bg-orange-600 hover:bg-orange-500 disabled:bg-zinc-800/50 disabled:text-zinc-600 disabled:cursor-not-allowed py-4 px-8 rounded-3xl font-black text-xl shadow-[0_8px_0_rgb(154,52,18)] transition-all btn-active disabled:shadow-none">
+                🔥 點燃炸彈
+            </button>
         </div>
 
-        <div class="tip-box">
-            <b style="color: #fb923c;">💡 3秒炒熱氣氛密技：</b> 點擊抽取隨機能量後，全班同步拍桌倒數 <b>「1、2、3，炸彈引爆！」</b>，接著立刻傳遞手機。拿到的人必須迅速做出該能量的<b>臨床肢體動作</b>並喊出護理應用！
+        <div class="mt-5 text-left bg-zinc-950/40 border border-white/5 p-4 rounded-2xl text-xs text-zinc-400 leading-relaxed">
+            <b class="text-orange-400">💡 3秒炒熱氣氛密技：</b> 點擊抽取隨機能量後，全班同步拍桌倒數 <b>「1、2、3，炸彈引爆！」</b>，接著立刻以順時針方向傳遞手機。拿到炸彈的人必須迅速做出該能量的<b>臨床肢體記憶動作</b>並大喊一個護理應用！
+        </div>
+
+        <div id="settings-panel" class="hidden absolute inset-x-4 top-16 z-30 glass-panel p-6 rounded-[3rem] shadow-3xl text-left max-h-[80vh] overflow-y-auto no-scrollbar">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-black text-xl tracking-tight text-orange-500">科學團康設定</h3>
+                <button onclick="toggleSettings()" class="p-2 hover:bg-white/10 rounded-full transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>                        
+            <div class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-zinc-400 uppercase tracking-widest">自定義能量清單 (以逗號隔開)</label>
+                    <textarea id="custom-topics" rows="2" class="w-full bg-zinc-800 border border-white/10 rounded-2xl px-4 py-2 text-sm focus:ring-2 focus:ring-orange-500/50 outline-none text-zinc-300 no-scrollbar" placeholder="例如：動能,位能,化學能..."></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase">背景配樂音量 <span id="bgm-vol-val">50%</span></span>
+                        <input type="range" id="bgm-volume" min="0" max="100" value="50" class="w-full h-1.5 bg-zinc-700 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] font-bold text-zinc-500 uppercase">倒數心跳音量 <span id="sfx-vol-val">70%</span></span>
+                        <input type="range" id="sfx-volume" min="0" max="100" value="70" class="w-full h-1.5 bg-zinc-700 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-zinc-400 uppercase tracking-widest">隨機爆炸時間範圍 (秒)</label>
+                    <div class="flex items-center gap-3">
+                        <input type="number" id="min-sec" value="8" class="bg-zinc-800 border border-white/10 rounded-xl px-3 py-1.5 w-full text-center text-sm font-bold outline-none">
+                        <span class="text-zinc-600">~</span>
+                        <input type="number" id="max-sec" value="20" class="bg-zinc-800 border border-white/10 rounded-xl px-3 py-1.5 w-full text-center text-sm font-bold outline-none">
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-white/5 flex flex-col gap-2">
+                    <button id="reset-btn" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-white/5 transition-all">重新載入遊戲</button>
+                    <div class="text-[10px] text-zinc-600 text-center font-mono uppercase tracking-tighter">
+                        倒數除錯計時器: <span id="debug-sec">--</span>s
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
-        // 將所有 JavaScript 語法降級為最傳統的 ES5 (var 與傳統 function)，確保舊版 Webview 絕不卡死
-        var audioCtx = null;
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        var player;
+        var isMuted = false;                
         var bgmInterval = null;
-        var gameInterval = null;
-        var timeLeft = 0;
-        var isPlaying = false;
 
-        // 初始化音訊物體（延遲到使用者點擊，防止手機安全封鎖）
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx && audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+        // 當 YouTube API 準備就緒時，綁定專利的緊張電子混音搖滾配樂
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('youtube-player', {
+                height: '0', width: '0',
+                videoId: 'XAYhNHhxN0A', // 經典快節奏電音配樂
+                playerVars: { 'autoplay': 0, 'controls': 0, 'rel': 0, 'loop': 1, 'playlist': 'XAYhNHhxN0A' },
+                events: { 
+                    'onReady': function() {
+                        updateBgmVolume();
+                    }
+                }
+            });
         }
 
-        // 系統倒數滴答聲
+        function updateBgmVolume() {
+            var vol = isMuted ? 0 : document.getElementById('bgm-volume').value;
+            document.getElementById('bgm-vol-val').innerText = vol + '%';
+            if (player && player.setVolume) player.setVolume(vol);
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            var icon = document.getElementById('speaker-icon');
+            if (isMuted) {
+                icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"></path><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+                if (player && player.pauseVideo) player.pauseVideo();
+            } else {
+                icon.innerHTML = '<path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>';
+                if (isPlaying && player && player.playVideo) player.playVideo();
+            }
+            updateBgmVolume();
+        }
+
+        // 系統音效（嗶嗶聲）
         function playTick(freq, length) {
-            if (!audioCtx) return;
-            try {
-                var osc = audioCtx.createOscillator();
-                var gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.setValueAtTime(freq || 800, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (length || 0.05));
-                osc.start();
-                osc.stop(audioCtx.currentTime + (length || 0.05));
-            } catch(e) {}
-            
-            // 嘗試觸發手機震動
-            if (navigator.vibrate) { navigator.vibrate(20); }
+            if (isMuted) return;
+            var sfxVol = document.getElementById('sfx-volume').value / 100;
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.setValueAtTime(freq || 800, audioCtx.currentTime);
+            gain.gain.setValueAtTime(sfxVol * 0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (length || 0.05));
+            osc.start();
+            osc.stop(audioCtx.currentTime + (length || 0.05));
+            if ("vibrate" in navigator) navigator.vibrate(20);
         }
 
-        // 模擬心跳聲
+        // 心跳聲輔助（疊加在音樂之上增加緊張感）
         function startHeartbeatBgm(rate) {
             if (bgmInterval) clearInterval(bgmInterval);
             bgmInterval = setInterval(function() {
-                if (!isPlaying || !audioCtx) return;
-                try {
-                    // 第一下
-                    var osc1 = audioCtx.createOscillator();
-                    var gain1 = audioCtx.createGain();
-                    osc1.connect(gain1); gain1.connect(audioCtx.destination);
-                    osc1.frequency.setValueAtTime(60, audioCtx.currentTime);
-                    gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                    gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                    osc1.start(); osc1.stop(audioCtx.currentTime + 0.1);
-
-                    // 第二下 (延遲 150 毫秒)
-                    setTimeout(function() {
-                        if (!isPlaying || !audioCtx) return;
-                        var osc2 = audioCtx.createOscillator();
-                        var gain2 = audioCtx.createGain();
-                        osc2.connect(gain2); gain2.connect(audioCtx.destination);
-                        osc2.frequency.setValueAtTime(55, audioCtx.currentTime);
-                        gain2.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                        gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                        osc2.start(); osc2.stop(audioCtx.currentTime + 0.1);
-                    }, 150);
-                } catch(e) {}
+                if (isMuted || !isPlaying) return;
+                var sfxVol = document.getElementById('sfx-volume').value / 100;
+                
+                var osc1 = audioCtx.createOscillator();
+                var gain1 = audioCtx.createGain();
+                osc1.connect(gain1); gain1.connect(audioCtx.destination);
+                osc1.frequency.setValueAtTime(60, audioCtx.currentTime);
+                gain1.gain.setValueAtTime(sfxVol * 0.3, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc1.start(); osc1.stop(audioCtx.currentTime + 0.1);
             }, rate);
         }
 
-        // 爆炸聲
+        // 爆炸白噪音
         function playExplode() {
-            if (!audioCtx) return;
-            try {
-                var bufferSize = audioCtx.sampleRate * 2;
-                var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-                var data = buffer.getChannelData(0);
-                for (var i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                var noise = audioCtx.createBufferSource();
-                noise.buffer = buffer;
-                var lowpass = audioCtx.createBiquadFilter();
-                lowpass.type = "lowpass";
-                lowpass.frequency.setValueAtTime(800, audioCtx.currentTime);
-                
-                var gain = audioCtx.createGain();
-                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.5);
-                
-                noise.connect(lowpass);
-                lowpass.connect(gain);
-                gain.connect(audioCtx.destination);
-                noise.start();
-            } catch(e) {}
-            if (navigator.vibrate) { navigator.vibrate([200, 100, 200, 100, 400]); }
+            if (isMuted) return;
+            var sfxVol = document.getElementById('sfx-volume').value / 100;
+            var bufferSize = audioCtx.sampleRate * 2.5;
+            var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            var data = buffer.getChannelData(0);
+            for (var i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+            var noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+            var lowpass = audioCtx.createBiquadFilter();
+            lowpass.type = "lowpass";
+            lowpass.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            lowpass.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 2.0);                        
+            
+            var gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(sfxVol * 1.0, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);                        
+
+            noise.connect(lowpass);
+            lowpass.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
+
+            if ("vibrate" in navigator) navigator.vibrate([200, 100, 200, 100, 500]);
         }
 
-        // 題庫與懲罰
-        var defaultTopics = [
+        // 7 大醫護核心能量種類題庫
+        const defaultTopics = [
             "🏃‍♂️ 🔴【動能】 (Kinetic Energy)", 
             "💧 🟢【位能】 (Potential Energy)", 
             "💊 🔵【化學能】 (Chemical Energy)", 
@@ -328,7 +287,8 @@
             "👂 ⚪【聲能】 (Sound Energy)"
         ];
 
-        var penalties = [
+        // 融入護理臨床思維的反思任務清單
+        const penalties = [
             "答不出來！請立刻做出『急救 CPR 按壓動作』5秒，並大喊一項動能臨床應用！",
             "炸彈在手上引爆！請高舉單手模擬『點滴袋掛高高』，並解釋重力位能的公式！",
             "血管被你撐爆啦！請說明洗 PICC 脆弱導管時，為什麼『禁止使用 3mL 小針筒』？",
@@ -337,88 +297,153 @@
             "反思關卡！請舉出兩種存在於人體生理學或病房儀器中的『聲能或光能』應用！"
         ];
 
-        // 點擊抽取隨機能量
+        var timeLeft = 0;
+        var gameInterval = null;
+        var isPlaying = false;
+
+        var startBtn = document.getElementById('start-btn');
+        var getTopicBtn = document.getElementById('get-topic-btn');
+        var topicText = document.getElementById('topic-text');
+        var penaltyText = document.getElementById('penalty-text');
+        var explosionMask = document.getElementById('explosion-mask');
+        var boomText = document.getElementById('boom-text');
+        var fuseFire = document.getElementById('fuse-fire');
+        var stage = document.getElementById('game-stage');
+        var bombSvg = document.getElementById('bomb-svg');
+        var statusLabel = document.getElementById('game-status');
+        var debugSec = document.getElementById('debug-sec');
+        var body = document.getElementById('main-body');
+
+        document.getElementById('bgm-volume').addEventListener('input', function(e) {
+            document.getElementById('bgm-vol-val').innerText = e.target.value + '%';
+            updateBgmVolume();
+        });
+        document.getElementById('sfx-volume').addEventListener('input', function(e) {
+            document.getElementById('sfx-vol-val').innerText = e.target.value + '%';
+        });
+
+        // 按下抽取題目：同時啟用與喚醒手機音訊（雙重保險）
         function handleNewTopic() {
-            if (isPlaying) return;
-            initAudio();
-
-            var randomTopic = defaultTopics[Math.floor(Math.random() * defaultTopics.length)];
-            document.getElementById('topic-text').innerText = randomTopic;
-
-            document.getElementById('start-btn').disabled = false;
-            document.getElementById('explosion-mask').style.display = 'none';
-            document.getElementById('bomb-svg').style.fill = '#52525b';
+            if (isPlaying) return;                        
+            audioCtx.resume();
             
-            var statusLabel = document.getElementById('game-status');
+            // 嘗試引導解鎖音樂
+            if (player && player.playVideo && player.pauseVideo) {
+                player.playVideo();
+                setTimeout(function() { player.pauseVideo(); }, 50);
+            }
+
+            const customInput = document.getElementById('custom-topics').value;
+            let currentPool = defaultTopics;
+            if (customInput.trim() !== "") {
+                currentPool = customInput.split(',').map(s => s.trim()).filter(s => s !== "");
+            }
+
+            const randomTopic = currentPool[Math.floor(Math.random() * currentPool.length)];
+            topicText.innerText = randomTopic;                        
+            
+            startBtn.disabled = false;
+            startBtn.classList.remove('opacity-50');
+            explosionMask.classList.add('hidden');
+            boomText.classList.remove('explosion-impact');
+            bombSvg.classList.remove('text-red-600', 'text-orange-500');
+            bombSvg.classList.add('text-zinc-700');
+            body.classList.remove('red-alert');
             statusLabel.innerText = "Energy Selected";
-            statusLabel.style.backgroundColor = "#7c2d12";
-            statusLabel.style.color = "#ffedd5";
-            
+            statusLabel.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-orange-900/30 text-orange-500 uppercase tracking-widest";
             playTick(1200, 0.1);
         }
 
-        // 點擊點燃炸彈
+        // 點火啟動遊戲：刺激背景音樂大聲播放
         function handleStartGame() {
-            if (isPlaying) return;
-            initAudio();
-
+            if (isPlaying || startBtn.disabled) return;                        
             isPlaying = true;
-            
-            var statusLabel = document.getElementById('game-status');
-            statusLabel.innerText = "🚨 Passing...";
-            statusLabel.style.backgroundColor = "#7f1d1d";
-            statusLabel.style.color = "#fee2e2";
-            
-            document.getElementById('start-btn').disabled = true;
-            document.getElementById('get-topic-btn').disabled = true;
-            document.getElementById('fuse-fire').style.display = 'block';
-            document.getElementById('bomb-svg').style.fill = '#ea580c';
-            document.getElementById('bomb-visual-wrapper').className = "bomb-wrapper pulse-effect";
+            audioCtx.resume();
 
-            // 設定刺激的團康隨機爆炸時間：8 到 18 秒
-            timeLeft = Math.floor(Math.random() * 11) + 8;
+            // 100% 播放刺激背景音樂
+            if (player && player.playVideo && !isMuted) {
+                player.seekTo(0);
+                player.playVideo();
+                updateBgmVolume();
+            }
+
+            statusLabel.innerText = "🚨 Passing...";
+            statusLabel.className = "text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-900/30 text-red-500 uppercase tracking-widest";
+            startBtn.disabled = true;
+            getTopicBtn.disabled = true;                        
+            
+            fuseFire.classList.remove('hidden');
+            stage.classList.add('shaking');
+            bombSvg.classList.replace('text-zinc-700', 'text-orange-500');
+            document.getElementById('bomb-visual-wrapper').classList.add('bomb-pulse');
+
+            const min = parseInt(document.getElementById('min-sec').value) || 8;
+            const max = parseInt(document.getElementById('max-sec').value) || 20;
+            timeLeft = Math.floor(Math.random() * (max - min + 1)) + min;
 
             startHeartbeatBgm(1000);
 
             gameInterval = setInterval(function() {
                 timeLeft--;
+                debugSec.innerText = timeLeft;                                
                 
                 if (timeLeft <= 4) {
-                    document.getElementById('bomb-svg').style.fill = '#dc2626';
-                    startHeartbeatBgm(400); // 倒數衝刺心跳變極快
+                    body.classList.add('red-alert');
+                    startHeartbeatBgm(350); // 心跳大暴走
                 } else if (timeLeft <= 8) {
-                    startHeartbeatBgm(650);
+                    startHeartbeatBgm(600);
                 }
 
-                playTick(timeLeft < 4 ? 1600 : 950, 0.05);
+                playTick(timeLeft < 4 ? 1700 : 950, 0.05);
 
-                if (timeLeft <= 0) {
-                    explode();
-                }
+                if (timeLeft <= 0) explode();
             }, 1000);
         }
 
-        // 爆炸
         function explode() {
             clearInterval(gameInterval);
             if (bgmInterval) clearInterval(bgmInterval);
             isPlaying = false;
             
-            playExplode();
+            // 暫停音樂並播放爆炸聲
+            if (player && player.pauseVideo) player.pauseVideo();
+            playExplode();                        
 
-            document.getElementById('explosion-mask').style.display = 'flex';
-            document.getElementById('fuse-fire').style.display = 'none';
-            document.getElementById('bomb-visual-wrapper').className = "bomb-wrapper";
-            document.getElementById('bomb-svg').style.fill = '#7f1d1d';
+            explosionMask.classList.remove('hidden');
+            boomText.classList.add('explosion-impact');                        
+            stage.classList.remove('shaking');
+            fuseFire.classList.add('hidden');
+            document.getElementById('bomb-visual-wrapper').classList.remove('bomb-pulse');
+            bombSvg.classList.replace('text-orange-500', 'text-red-600');                        
             
-            var randomPenalty = penalties[Math.floor(Math.random() * penalties.length)];
-            document.getElementById('penalty-text').innerText = randomPenalty;
-            
-            var statusLabel = document.getElementById('game-status');
+            penaltyText.innerText = penalties[Math.floor(Math.random() * penalties.length)];
             statusLabel.innerText = "💥 Exploded";
-            
-            document.getElementById('get-topic-btn').disabled = false;
+            getTopicBtn.disabled = false;
         }
+
+        function toggleSettings() {
+            document.getElementById('settings-panel').classList.toggle('hidden');
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen();
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (!isPlaying && !startBtn.disabled) handleStartGame();
+                else if (!isPlaying) handleNewTopic();
+            }
+        });
+
+        getTopicBtn.addEventListener('click', handleNewTopic);
+        startBtn.addEventListener('click', handleStartGame);
+        document.getElementById('reset-btn').addEventListener('click', function() { location.reload(); });
     </script>
 </body>
 </html>
